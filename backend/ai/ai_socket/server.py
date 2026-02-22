@@ -11,7 +11,7 @@ import socket
 import json
 import re
 
-HOST = '192.168.80.14'
+HOST = '0.0.0.0'
 PORT = 2828
 
 url = 'http://localhost:8080/api/v1/groundtruth/saveAiResponse'
@@ -22,7 +22,7 @@ load_dotenv(dotenvpath)
 
 client = OpenAI(
   base_url="https://openrouter.ai/api/v1",
-  api_key=os.getenv("api_key"),
+  api_key=os.getenv("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"),
 )
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
