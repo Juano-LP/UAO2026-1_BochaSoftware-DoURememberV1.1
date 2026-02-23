@@ -5,7 +5,7 @@ node_modules/
 .env
 .env.local
 .env.*.local
-
+backend/ai/ai_socket/.env
 # Logs
 logs/
 *.log
