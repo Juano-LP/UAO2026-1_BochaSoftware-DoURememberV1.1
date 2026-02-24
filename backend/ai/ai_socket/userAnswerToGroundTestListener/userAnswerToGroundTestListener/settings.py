@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-b00rrj0&v491bc#gzz!bbxzs*k&^j8r9x52-wx@3$ghi^p=!l$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -40,9 +40,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",  # Cambia si tu frontend usa otro puerto
-]
+CORS_ALLOW_ALL_ORIGINS = True  # Cambia si tu frontend usa otro puerto
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 ROOT_URLCONF = 'userAnswerToGroundTestListener.urls'
 

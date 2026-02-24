@@ -53,7 +53,7 @@ export class App {
 
           const token = response.token;
           const payload = this.authService.getpayload(token);   // for taking the first part of the jwt, and in this part we take the payload [1]
-          const user = { username: payload.sub }
+          const user = { id: payload.id ?? null, username: payload.sub }
           const login = { user, isAuth: true, isAdmin: payload.isAdmin } //is doctor?
 
           //session storage
@@ -61,7 +61,7 @@ export class App {
           this.authService.user = login // under the hood invokes the set method
           // here i should change if it is doctor or if its patient using the jwt claims
 
-          const userId = this.getUserId()
+          const userId = payload.id ?? this.getUserId()
 
           if(login.isAdmin != true){this.router.navigate([`/patient/${userId}`]);}
           else{this.router.navigate([`/doctor/${userId}/patients`]);}
