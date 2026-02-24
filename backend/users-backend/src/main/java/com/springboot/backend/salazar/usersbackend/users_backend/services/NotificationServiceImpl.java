@@ -88,6 +88,23 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
+    /**
+     * Backward-compatible alias for previous controller implementations.
+     */
+    @Transactional(readOnly = true)
+    public List<Notification> getByUser(Long userId, boolean unreadOnly) {
+        return listByUser(userId, unreadOnly);
+    }
+
+    /**
+     * Backward-compatible helper that creates a reminder notification.
+     */
+    @Transactional
+    public Notification createNotification(Long userId, String title, String description) {
+        String eventKey = "MANUAL:" + userId + ":" + System.currentTimeMillis();
+        return createIfNotExists(userId, eventKey, NotificationType.REMINDER, title, description, LocalDateTime.now());
+    }
+
     @Override
     @Transactional
     public Notification markAsRead(Long notificationId, Long userId) {
@@ -105,6 +122,13 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         return notification;
+    }
+
+    @Override
+    public void sendDailyLessonEmailToAddress(String destinationEmail) {
+        String title = "Recordatorio: lección diaria pendiente";
+        String description = "Es momento de completar tu lección diaria para mantener tu progreso.";
+        sendEmailOrThrow(destinationEmail, title, description);
     }
 
     @Override
@@ -137,6 +161,42 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         return emitter;
+    }
+
+    private void sendEmailOrThrow(String destination, String subject, String body) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            if (fromEmail != null && !fromEmail.isBlank()) {
+                message.setFrom(fromEmail);
+            }
+
+            message.setTo(destination);
+            message.setSubject(subject);
+            message.setText(body);
+            mailSender.send(message);
+        } catch (Exception ex) {
+            LOGGER.error("Daily lesson email could not be sent to {}", destination, ex);
+            throw new IllegalStateException("Email dispatch failed for destination: " + destination, ex);
+        }
+    }
+
+    /**
+     * Backward-compatible helper for controllers that send ad-hoc emails.
+     */
+    public void sendEmail(String destination, String subject, String body) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            if (fromEmail != null && !fromEmail.isBlank()) {
+                message.setFrom(fromEmail);
+            }
+
+            message.setTo(destination);
+            message.setSubject(subject);
+            message.setText(body);
+            mailSender.send(message);
+        } catch (Exception ex) {
+            LOGGER.warn("Ad-hoc email could not be sent to {}: {}", destination, ex.getMessage());
+        }
     }
 
     private void sendEmail(Notification notification) {

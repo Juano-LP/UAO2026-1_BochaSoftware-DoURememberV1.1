@@ -73,7 +73,27 @@ public class NotificationController {
     @PostMapping("/daily-lesson/run")
     public ResponseEntity<?> triggerDailyLesson() {
         notificationService.sendDailyLessonNotifications();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Map.of(
+                "message", "Daily lesson notifications triggered for all users"));
+    }
+
+    @PostMapping("/daily-lesson/send-to-email")
+    public ResponseEntity<?> sendDailyLessonToEmail(@RequestParam String email) {
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "email is required"));
+        }
+
+        try {
+            notificationService.sendDailyLessonEmailToAddress(email);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Daily lesson email sent",
+                    "email", email));
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "error", "email_send_failed",
+                    "email", email,
+                    "message", ex.getMessage()));
+        }
     }
 
     /**

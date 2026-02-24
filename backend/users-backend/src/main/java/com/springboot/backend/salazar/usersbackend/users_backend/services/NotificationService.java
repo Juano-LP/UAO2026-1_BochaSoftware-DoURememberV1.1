@@ -19,5 +19,7 @@ public interface NotificationService {
 
     void sendDailyLessonNotifications();
 
+    void sendDailyLessonEmailToAddress(String destinationEmail);
+
     SseEmitter subscribe(Long userId);
 }
