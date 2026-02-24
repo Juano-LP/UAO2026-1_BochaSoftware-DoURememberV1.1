@@ -1,0 +1,6 @@
+openai
+python-dotenv
+requests
+django
+djangorestframework
+django-cors-headers

@@ -72,9 +72,10 @@ public class NotificationController {
 
     @PostMapping("/daily-lesson/run")
     public ResponseEntity<?> triggerDailyLesson() {
-        notificationService.sendDailyLessonNotifications();
+        int createdCount = notificationService.sendDailyLessonNotifications();
         return ResponseEntity.ok(Map.of(
-                "message", "Daily lesson notifications triggered for all users"));
+                "message", "Daily lesson notifications triggered for all users",
+                "createdNotifications", createdCount));
     }
 
     @PostMapping("/daily-lesson/send-to-email")

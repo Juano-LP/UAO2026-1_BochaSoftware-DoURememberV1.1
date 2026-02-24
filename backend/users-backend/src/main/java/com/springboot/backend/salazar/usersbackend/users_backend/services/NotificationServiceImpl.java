@@ -133,16 +133,25 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
-    public void sendDailyLessonNotifications() {
+    public int sendDailyLessonNotifications() {
         LocalDate currentDate = LocalDate.now();
         String title = "Recordatorio: lección diaria pendiente";
         String description = "Es momento de completar tu lección diaria para mantener tu progreso.";
+        int createdNotifications = 0;
 
         for (User user : userRepository.findAll()) {
             String eventKey = "DAILY_LESSON:" + currentDate + ":user-" + user.getId();
+            boolean existed = notificationRepository.findByUserIdAndEventKey(user.getId(), eventKey).isPresent();
+
             createIfNotExists(user.getId(), eventKey, NotificationType.DAILY_LESSON, title, description,
                     currentDate.atStartOfDay());
+
+            if (!existed) {
+                createdNotifications++;
+            }
         }
+
+        return createdNotifications;
     }
 
     @Override

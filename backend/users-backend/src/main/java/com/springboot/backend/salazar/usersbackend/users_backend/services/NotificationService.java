@@ -17,7 +17,7 @@ public interface NotificationService {
 
     Notification markAsRead(Long notificationId, Long userId);
 
-    void sendDailyLessonNotifications();
+    int sendDailyLessonNotifications();
 
     void sendDailyLessonEmailToAddress(String destinationEmail);
 

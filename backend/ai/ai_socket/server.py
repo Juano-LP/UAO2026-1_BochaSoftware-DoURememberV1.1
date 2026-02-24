@@ -6,11 +6,11 @@ import time
 import requests
 from openai import OpenAI
 import os
-from dotenv import find_dotenv, load_dotenv
+from dotenv import  load_dotenv, find_dotenv
 import socket
 import json
 import re
-
+from pathlib import Path
 HOST = '0.0.0.0'
 PORT = 2828
 
@@ -20,10 +20,24 @@ url = 'http://localhost:8080/api/v1/groundtruth/saveAiResponse'
 dotenvpath = find_dotenv()
 load_dotenv(dotenvpath)
 
+
+api_key = (
+    os.getenv("api_key")
+    or os.getenv("OPENROUTER_API_KEY")
+    or os.getenv("OPENAI_API_KEY")
+)
+if not api_key:
+    raise ValueError(
+        "Missing OpenRouter/OpenAI key. "
+        f"Create {dotenvpath} with api_key=your_key "
+        "or set OPENROUTER_API_KEY / OPENAI_API_KEY in your environment."
+    )
+
+
 client = OpenAI(
   base_url="https://openrouter.ai/api/v1",
-  api_key=os.getenv("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"),
-)
+   api_key=api_key,
+ )
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST,PORT))
