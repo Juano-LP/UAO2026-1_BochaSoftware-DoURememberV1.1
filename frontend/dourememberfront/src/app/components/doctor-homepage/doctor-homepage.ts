@@ -36,12 +36,15 @@ export class DoctorHomepage {
 
   constructor(private readonly ServiceDoctors: ServiceDoctors, private readonly PatientsService: PatientsService){
     this.userId = this.PatientsService.getUserId();
-    this.PatientsService.getAllUserInformation(this.userId).subscribe(userInfo => {
-      this.doctorInfo.set(userInfo)
-      this.doctorName.set( this.doctorInfo().name)
-      this.doctorImage = this.doctorInfo().profilepicture
-    })
-    this.getAllPatients()
+
+    if (this.userId !== null && !Number.isNaN(this.userId)) {
+      this.PatientsService.getAllUserInformation(this.userId).subscribe(userInfo => {
+        this.doctorInfo.set(userInfo)
+        this.doctorName.set( this.doctorInfo().name)
+        this.doctorImage = this.doctorInfo().profilepicture
+      })
+      this.getAllPatients()
+    }
   }
 
   getAllPatients(){

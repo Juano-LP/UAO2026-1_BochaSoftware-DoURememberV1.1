@@ -2,6 +2,7 @@ package com.springboot.backend.salazar.usersbackend.users_backend.controllers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +43,13 @@ public class NotificationController {
         }
 
         LocalDateTime eventAt = request.getEventAt() == null ? LocalDateTime.now() : request.getEventAt();
-        Notification notification = notificationService.createIfNotExists(request.getUserId(), request.getEventKey(),
-                request.getType(), request.getTitle(), request.getDescription(), eventAt);
+        Notification notification = notificationService.createIfNotExists(
+                request.getUserId(),
+                request.getEventKey(),
+                request.getType(),
+                request.getTitle(),
+                request.getDescription(),
+                eventAt);
 
         return ResponseEntity.ok(notification);
     }
@@ -68,5 +74,30 @@ public class NotificationController {
     public ResponseEntity<?> triggerDailyLesson() {
         notificationService.sendDailyLessonNotifications();
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Endpoint de compatibilidad para pruebas manuales.
+     * Crea una notificación de acuerdo con el payload estándar.
+     */
+    @PostMapping("/test-email")
+    public ResponseEntity<?> sendTestNotificationAndEmail(@Valid @RequestBody CreateNotificationRequest request,
+            BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getAllErrors());
+        }
+
+        LocalDateTime eventAt = request.getEventAt() == null ? LocalDateTime.now() : request.getEventAt();
+        Notification created = notificationService.createIfNotExists(
+                request.getUserId(),
+                request.getEventKey(),
+                request.getType(),
+                request.getTitle(),
+                request.getDescription(),
+                eventAt);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Notification created (email dispatch handled by service)",
+                "notificationId", created.getId()));
     }
 }

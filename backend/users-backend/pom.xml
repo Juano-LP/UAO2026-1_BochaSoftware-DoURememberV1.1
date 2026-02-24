@@ -71,7 +71,7 @@
 		</dependency>
 		<dependency>
 		<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId> #- Para enviar correos electrónicos, como para la verificación de cuentas o restablecimiento de contraseñas.
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

@@ -52,6 +52,10 @@ export class PatientHome implements OnInit, OnDestroy {
   }
 
   findUserById(id: number | null): void {
+    if (id === null || Number.isNaN(id)) {
+      return;
+    }
+
     this.patientsService.getAllUserInformation(id).subscribe((userInfo) => {
       this.user.set(userInfo);
     });

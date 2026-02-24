@@ -29,23 +29,52 @@ export class PatientsService{
     return this.http.post(`${this.url}/createDoctor`, this.empty);
   }
 
+  private decodeJwtPayload(token: string): any | null {
+    try {
+      const payloadBase64 = token.split('.')[1];
+      if (!payloadBase64) {
+        return null;
+      }
 
+      const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=');
+      return JSON.parse(atob(padded));
+    } catch {
+      return null;
+    }
+  }
 
   getUserId(): number | null {
-  const token = sessionStorage.getItem("token"); // 0. retrieve token
-  if (!token) return null;
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      const payload = this.decodeJwtPayload(token);
+      const tokenId = payload?.id;
+      if (typeof tokenId === 'number') {
+        return tokenId;
+      }
+      if (typeof tokenId === 'string' && tokenId.trim() !== '' && !Number.isNaN(Number(tokenId))) {
+        return Number(tokenId);
+      }
+    }
 
-  const payloadBase64 = token.split(".")[1]; // part after first dot
-  if (!payloadBase64) return null;
+    const loginRaw = sessionStorage.getItem('login');
+    if (loginRaw) {
+      try {
+        const login = JSON.parse(loginRaw);
+        const loginId = login?.user?.id;
+        if (typeof loginId === 'number') {
+          return loginId;
+        }
+        if (typeof loginId === 'string' && loginId.trim() !== '' && !Number.isNaN(Number(loginId))) {
+          return Number(loginId);
+        }
+      } catch {
+        return null;
+      }
+    }
 
-  // 1. decode Base64URL → 2. JSON
-  const json = JSON.parse(
-    atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/"))
-  );
-
-  // 3. get id
-  return json.id ?? null;
-}
+    return null;
+  }
 
   findAllUserSessionsByUserIdPage(userId: number, page: number): Observable<any> {
     return this.http.get<any>(`${this.url}/findAllByUserId/${userId}/sessions/${page}`);
