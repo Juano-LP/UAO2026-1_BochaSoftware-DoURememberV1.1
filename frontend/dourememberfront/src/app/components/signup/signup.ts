@@ -1,9 +1,9 @@
 import { PatientsService } from './../../services/patientsService';
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { User } from "../../models/User"
+import { User } from '../../models/User';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from "@angular/common"
+import { CommonModule } from '@angular/common';
 import { Doctor } from '../../models/Doctor';
 
 
@@ -16,33 +16,40 @@ export class Signup {
 
   user: User;
 
-  constructor(private readonly patientsService: PatientsService, private readonly router: Router){
+  constructor(private readonly patientsService: PatientsService, private readonly router: Router) {
       this.user = new User();
   }
 
   onSubmit(): void {
-    const { id, ...userWithoutId } = this.user;
+    const userPayload = this.normalizeUserPayload(this.user);
 
-    this.patientsService.createPatient(userWithoutId as User).subscribe(_ => {
-      // wait 2 seconds, then create a new doctor (without id) and navigate after it's created
-      setTimeout(() => {
-        const doctor = new Doctor();
-        // ensure there's no id in the body we send
-        if ((doctor as any).id !== undefined) {
-          delete (doctor as any).id;
-        }
-
-        this.patientsService.createNewDoctor(doctor).subscribe(
-          () => {
-            this.router.navigate([`/login`]);
-          },
-          () => {
-            // on error, still navigate to login (adjust behavior if needed)
-            this.router.navigate([`/login`]);
+    this.patientsService.createPatient(userPayload).subscribe({
+      next: () => {
+        setTimeout(() => {
+          const doctor = new Doctor();
+          if ((doctor as any).id !== undefined) {
+            delete (doctor as any).id;
           }
-        );
-      }, 2000);
+        this.patientsService.createNewDoctor(doctor).subscribe({
+            next: () => this.router.navigate(['/login']),
+            error: () => this.router.navigate(['/login'])
+          });
+        }, 2000);
+      },
+      error: (error) => {
+        console.error('User signup failed', error?.error ?? error);
+      }
     });
+  }
+  private normalizeUserPayload(user: User): User {
+    const { id, ...userWithoutId } = user;
+
+    return {
+      ...userWithoutId,
+      profilepicture: userWithoutId.profilepicture?.trim() || 'default-profile.png',
+      medical_condition: userWithoutId.medical_condition?.trim() || 'Sin condición reportada',
+      carer: userWithoutId.carer?.trim() || 'Sin cuidador asignado'
+    } as User;
   }
 
 }

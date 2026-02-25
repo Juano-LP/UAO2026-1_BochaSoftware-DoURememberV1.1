@@ -40,31 +40,29 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        return http.authorizeHttpRequests( authz ->
-
-         authz.requestMatchers(HttpMethod.GET, "/api/v1/users", "/api/v1/users/page/{page}"
-                ).permitAll()
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http.authorizeHttpRequests(authz -> authz
+                .requestMatchers(HttpMethod.GET, "/api/v1/users", "/api/v1/users/page/{page}").permitAll()
                 .requestMatchers("/api/v1/notifications/**").permitAll()
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/api/v1/groundtruth/**").permitAll()
                 .requestMatchers("/api/v1/users/**").permitAll()
                 .anyRequest().authenticated())
-        .cors(cors -> cors.configurationSource(configurationSource()))
-        .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-        .addFilter(new jwtValidationFilter(authenticationManager()))
-        .csrf(config -> config.disable())
-        .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .build();
+                .cors(cors -> cors.configurationSource(configurationSource()))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+                .addFilter(new jwtValidationFilter(authenticationManager()))
+                .csrf(config -> config.disable())
+                .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .build();
     }
 
     @Bean
     CorsConfigurationSource configurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(Arrays.asList("*"));
-        config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "http://127.0.0.1:*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-type"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setExposedHeaders(Arrays.asList("Authorization"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

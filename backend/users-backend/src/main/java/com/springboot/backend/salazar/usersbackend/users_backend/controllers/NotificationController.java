@@ -37,15 +37,20 @@ public class NotificationController {
 
     @PostMapping
     public ResponseEntity<?> createNotification(@Valid @RequestBody CreateNotificationRequest request,
-            BindingResult result) {
+            BindingResult result,
+            @RequestParam(defaultValue = "false") boolean force) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
 
         LocalDateTime eventAt = request.getEventAt() == null ? LocalDateTime.now() : request.getEventAt();
+        String eventKey = force
+                ? request.getEventKey() + ":retry-" + System.currentTimeMillis()
+                : request.getEventKey();
+
         Notification notification = notificationService.createIfNotExists(
                 request.getUserId(),
-                request.getEventKey(),
+                eventKey,
                 request.getType(),
                 request.getTitle(),
                 request.getDescription(),
