@@ -23,4 +23,6 @@ Como ejecutar el proyecto con su nueva funcionalidad:
       - aqui ejecuta python server.py
 2. Para levantar el frontend navegas a esto:
     -   frontend\dourememberfront y aqui ejecutas: npm install y posteriormente npm start
-    -   
+3. Para probar el sistema de notificaciones debes tener todo funcionando(punto 1 y 2)
+    - Posteriorimente ejeccutar el siguiente comando:
+      - Invoke-RestMethod -Method Post -Uri "http://localhost:8080/api/v1/notifications/daily-lesson/send-to-email?email=el correo que mandas la notificacion" 
